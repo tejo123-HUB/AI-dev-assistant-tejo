@@ -58,7 +58,7 @@ No account required. No API key needed to get started. Fully open source.
 |  **Query History** | Last 50 queries saved locally |
 |  **Saved Favorites** | Bookmark important results |
 |  **Download Results** | Export analysis as `.txt` |
-- **LLM-Ready** | Optional OpenAI-compatible API support (rule-based engine included) |
+|  **LLM-Ready** | Drop-in OpenAI-compatible API support via env vars |
 |  **Swagger Docs** | Full interactive API documentation at `/docs` |
 
 ---
@@ -72,35 +72,12 @@ git clone https://github.com/imDarshanGK/AI-dev-assistant.git
 cd AI-dev-assistant
 ```
 
-### 2. Install Backend Dependencies
+### 2. Start the backend
 
 ```bash
 cd backend
 pip install -r requirements.txt
-```
-
-### 3. Configure Environment (Optional)
-
-Create a `.env` file in the `backend/` directory:
-
-```bash
-cp ../.env.example backend/.env
-```
-
-Edit `backend/.env` to enable LLM mode (optional):
-
-```bash
-LLM_ENABLED=false
-LLM_API_KEY=
-LLM_BASE_URL=https://api.openai.com/v1
-LLM_MODEL=gpt-4o-mini
-```
-
-### 4. Start the Backend
-
-```bash
-cd backend
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+uvicorn app.main:app --reload
 ```
 
 | Endpoint | URL |
@@ -109,24 +86,14 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 | Interactive Docs | http://localhost:8000/docs |
 | Health Check | http://localhost:8000/health |
 
-### 5. Open the Frontend
-
-The frontend is automatically mounted at:
-
-```
-http://localhost:8000/app/
-```
-
-Or open `frontend/index.html` directly in your browser (will auto-detect the backend URL).
-
-Set the **API URL** in the workspace to `http://localhost:8000` and click **Analyze Code**.
-
-### 6. Run Tests
+### 3. Open the frontend
 
 ```bash
-cd backend
-pytest -q
+# Open in browser — no build step required
+open frontend/index.html
 ```
+
+Set the API URL in the workspace to `http://localhost:8000` and click **Analyze Code**.
 
 ---
 
@@ -238,27 +205,14 @@ AI-dev-assistant/
 
 ---
 
----
+## Running Tests
 
-## Contact & Community
+```bash
+cd backend
+pytest -q
+```
 
-**Have questions or ideas?** Open a discussion on [GitHub Discussions](https://github.com/imDarshanGK/AI-dev-assistant/discussions).
-
----
-
-## Contributing
-
-We welcome contributions from beginners and experienced developers alike.
-
-- **New to open source?** Start with [good first issue](https://github.com/imDarshanGK/AI-dev-assistant/labels/good%20first%20issue) label.
-- **Want to contribute?** Read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-- **Found a bug?** Open an [issue](https://github.com/imDarshanGK/AI-dev-assistant/issues/new) with details.
-
----
-
-## License
-
-MIT License — see [LICENSE](LICENSE) for details.
+Tests run automatically on every push and pull request via GitHub Actions.
 
 ---
 
