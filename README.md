@@ -72,28 +72,32 @@ git clone https://github.com/imDarshanGK/AI-dev-assistant.git
 cd AI-dev-assistant
 ```
 
-### 2. Start the backend
+### 2. Install Backend Dependencies
 
 ```bash
 cd backend
 pip install -r requirements.txt
-uvicorn app.main:app --reload
 ```
 
-| Endpoint | URL |
-|---|---|
-| API Root | http://localhost:8000/ |
-| Interactive Docs | http://localhost:8000/docs |
-| Health Check | http://localhost:8000/health |
-
-### 3. Open the frontend
+### 3. Start the Backend
 
 ```bash
-# Open in browser — no build step required
-open frontend/index.html
+cd backend
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Set the API URL in the workspace to `http://localhost:8000` and click **Analyze Code**.
+### 4. Open the Frontend
+
+```
+http://localhost:8000/app/
+```
+
+### 5. Run Tests
+
+```bash
+cd backend
+pytest -q
+```
 
 ---
 
@@ -205,14 +209,15 @@ AI-dev-assistant/
 
 ---
 
-## Running Tests
+## Contributing
 
-```bash
-cd backend
-pytest -q
+We welcome contributions from all levels. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+**New to open source?** Check [good first issue](https://github.com/imDarshanGK/AI-dev-assistant/labels/good%20first%20issue).
+
+**Have questions?** Ask in [GitHub Discussions](https://github.com/imDarshanGK/AI-dev-assistant/discussions).
 ```
 
-Tests run automatically on every push and pull request via GitHub Actions.
 
 ---
 
