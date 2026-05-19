@@ -1267,6 +1267,7 @@ editor.addEventListener('keydown', e => {
       start + 4;
 
     updateEditor();
+    scheduleCommitEdit();
   }
 
   // AUTO INDENT ON ENTER
@@ -1323,6 +1324,7 @@ editor.addEventListener('keydown', e => {
       start + 1 + indent.length;
 
     updateEditor();
+    scheduleCommitEdit();
   }
 
   // SMART BACKSPACE
@@ -1362,6 +1364,7 @@ editor.addEventListener('keydown', e => {
           start - 4;
 
         updateEditor();
+        scheduleCommitEdit();
       }
     }
   }
@@ -1403,8 +1406,7 @@ document.body.addEventListener('drop', e => {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = ev => {
-    editor.value = ev.target.result;
-    updateEditor();
+    setEditorValue(ev.target.result);
     toast(`Dropped ${file.name}`, 'success');
   };
   reader.readAsText(file);
@@ -1429,7 +1431,7 @@ function setLanguage(lang) {
   
   // 3. If it is a sample, swap it to the new language's sample automatically
   if (isSample) {
-    editor.value = SAMPLES[lang] || SAMPLES.python;
+    setEditorValue(SAMPLES[lang] || SAMPLES.python);
     updateEditor();
   }
 }
@@ -1474,8 +1476,7 @@ document.querySelectorAll('.result-tab').forEach(t => {
    CLEAR / COPY
 ═══════════════════════════════════════════════════════════════ */
 document.getElementById('clearBtn').addEventListener('click', () => {
-  editor.value = '';
-  updateEditor();
+  setEditorValue('');
   resetResults();
 });
 document.getElementById('copyBtn').addEventListener('click', () => {
@@ -1786,8 +1787,7 @@ function renderHistory() {
 function loadEntry(id) {
   const entry = history.find(h => h.id === id);
   if (!entry) return;
-  editor.value = entry.code;
-  updateEditor();
+  setEditorValue(entry.code);
   currentResult = entry.result;
   renderResults(entry.result, entry.code);
   document.getElementById('workspace').scrollIntoView({behavior:'smooth'});
@@ -1836,8 +1836,7 @@ function renderFavorites() {
 function loadFav(id) {
   const entry = favorites.find(f => f.id === id);
   if (!entry) return;
-  editor.value = entry.code;
-  updateEditor();
+  setEditorValue(entry.code);
   currentResult = entry.result;
   renderResults(entry.result, entry.code);
   document.getElementById('workspace').scrollIntoView({behavior:'smooth'});
@@ -2017,8 +2016,7 @@ int main() {
 
 function loadSample() {
   const sample = SAMPLES[selectedLang] || SAMPLES.python;
-  editor.value = sample;
-  updateEditor();
+  setEditorValue(sample);
   document.getElementById('workspace').scrollIntoView({behavior:'smooth'});
   toast('Sample code loaded — click Analyze!', 'success');
 }
