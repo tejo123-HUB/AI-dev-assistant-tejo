@@ -3278,6 +3278,14 @@ function loadEntry(id) {
 }
       }
 
+document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+  if (!confirm('Clear all history? This cannot be undone.')) return;
+
+  history = [];
+  localStorage.removeItem('qyx_history');
+  renderHistory();
+  toast('History cleared', 'info');
+});
       function loadEntry(id) {
         const entry = history.find(h => h.id === id);
         if (!entry) return;
@@ -3287,13 +3295,6 @@ function loadEntry(id) {
         renderResults(entry.result, entry.code);
         document.getElementById('workspace').scrollIntoView({ behavior: 'smooth' });
       }
-
-      document.getElementById('clearHistoryBtn').addEventListener('click', () => {
-        history = [];
-        localStorage.removeItem('qyx_history');
-        renderHistory();
-        toast('History cleared', 'info');
-      });
 
       /* ═══════════════════════════════════════════════════════════════
          FAVORITES
@@ -3338,6 +3339,14 @@ function loadFav(id) {
 }
       }
 
+document.getElementById('clearFavsBtn').addEventListener('click', () => {
+  if (!confirm('Clear all favorites? This cannot be undone.')) return;
+  
+  favorites = [];
+  localStorage.removeItem('qyx_favorites');
+  renderFavorites();
+  toast('Favorites cleared', 'info');
+});
       function loadFav(id) {
         const entry = favorites.find(f => f.id === id);
         if (!entry) return;
@@ -3347,14 +3356,6 @@ function loadFav(id) {
         renderResults(entry.result, entry.code);
         document.getElementById('workspace').scrollIntoView({ behavior: 'smooth' });
       }
-
-      document.getElementById('clearFavsBtn').addEventListener('click', () => {
-        favorites = [];
-        localStorage.removeItem('qyx_favorites');
-        renderFavorites();
-        toast('Favorites cleared', 'info');
-      });
-
       /* ═══════════════════════════════════════════════════════════════
          DOWNLOAD
       ═══════════════════════════════════════════════════════════════ */
