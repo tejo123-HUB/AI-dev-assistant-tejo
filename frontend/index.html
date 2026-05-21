@@ -3159,42 +3159,62 @@
           }
         });
 
-      } catch (error) {
-        console.error("Pipeline analytics data extraction failure:", error);
+      /* ═══════════════════════════════════════════════════════════════
+         HISTORY
+      ═══════════════════════════════════════════════════════════════ */
+      function addToHistory(code, result) {
+        const lang = result.explanation?.language || result.debugging?.language||result.suggestions?.language||selectedLang;
+        const entry = {
+          id: Date.now(),
+          code,
+          result,
+          lang,
+          ts: new Date().toLocaleTimeString(),
+          preview: code.slice(0, 60).replace(/\n/g, ' '),
+        };
+        history.unshift(entry);
+        if (history.length > MAX_HISTORY) history = history.slice(0, MAX_HISTORY);
+        localStorage.setItem('qyx_history', JSON.stringify(history));
+        renderHistory();
+      }
+
+      function renderHistory() {
+        if (!history.length) {
+          historyList.innerHTML = '<div class="list-empty">No history yet. Run your first analysis.</div>';
+          return;
+        }
+        historyList.innerHTML = history.map(h => `
+    <div class="history-item" onclick="loadEntry('${h.id}')" tabindex="0" role="button" aria-label="Load history entry for ${h.lang} at ${h.ts}" onkeydown="if(event.key==='Enter'||event.key===' ') { event.preventDefault(); loadEntry('${h.id}'); }">
+      <span class="history-lang">${h.lang || '?'}</span>
+      <span class="history-thumb">${escHtml(h.preview)}…</span>
+      <span class="history-meta">${h.ts}</span>
+    </div>`).join('');
       }
     }
 
-    /* ═══════════════════════════════════════════════════════════════
-   ANALYZE CORE LOGIC PIPELINE
-═══════════════════════════════════════════════════════════════ */
-    const analyzeBtn = document.getElementById('analyzeBtn');
-    const resultActions = document.getElementById('resultActions');
-    const engineInfo = document.getElementById('engineInfo');
-    const timeInfo = document.getElementById('timeInfo');
+document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+  if (!confirm('Clear all history? This cannot be undone.')) return;
 
-    analyzeBtn.addEventListener('click', doAnalyze);
+  history = [];
+  localStorage.removeItem('qyx_history');
+  renderHistory();
+  toast('History cleared', 'info');
+});
+      function loadEntry(id) {
+        const entry = history.find(h => h.id === Number (id));
+        console.log(entry);
+        if (!entry) return;
+        editor.value = entry.code;
 
-    async function doAnalyze() {
-      const code = editor.value.trim();
-      if (!code) {
-        toast('Please paste some code first.', 'error');
-        return;
+        if(entry.lang){
+          setLanguage(entry.lang.toLowerCase());
+        }
+        
+        updateEditor();
+        currentResult = entry.result;
+        renderResults(entry.result, entry.code);
+        document.getElementById('workspace').scrollIntoView({ behavior: 'smooth' });
       }
-      const base = apiUrlInput.value.replace(/\/$/, '');
-      const endpointMap = { analyze: '/analyze/', explain: '/explanation/', debug: '/debugging/', suggest: '/suggestions/' };
-      const endpoint = endpointMap[selectedMode] || '/analyze/';
-
-      analyzeBtn.classList.add('loading');
-      analyzeBtn.disabled = true;
-      showShimmers();
-
-      try {
-        const res = await fetch(`${base}${endpoint}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code, language: selectedLang }),
-          signal: AbortSignal.timeout(30000),
-        });
 
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
@@ -3229,12 +3249,28 @@
           refreshProgressDashboard();
         }
 
-      } catch (err) {
-        toast(err.message || 'Analysis processing crash runtime exception.', 'error');
-        resetResults();
-      } finally {
-        analyzeBtn.classList.remove('loading');
-        analyzeBtn.disabled = false;
+document.getElementById('clearFavsBtn').addEventListener('click', () => {
+  if (!confirm('Clear all favorites? This cannot be undone.')) return;
+  
+  favorites = [];
+  localStorage.removeItem('qyx_favorites');
+  renderFavorites();
+  toast('Favorites cleared', 'info');
+});
+      function loadFav(id) {
+        const entry = favorites.find(f => f.id === Number(id));
+        if (!entry) return;
+        editor.value = entry.code;
+        selectedLang = entry.lang.toLowerCase();
+        document.querySelectorAll('.lang-tab').forEach(tab =>{
+          const active = tab.dataset.lang === selectedLang;
+          tab.classList.toggle('active', active);
+          tab.setAttribute('aria-selected', active ? 'true' : 'false');
+        });
+        updateEditor();
+        currentResult = entry.result;
+        renderResults(entry.result, entry.code);
+        document.getElementById('workspace').scrollIntoView({ behavior: 'smooth' });
       }
     }
 
